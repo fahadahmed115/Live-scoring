@@ -4,16 +4,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Score Overlay</title>
+<title>RRS CUES - TV Scoreboard</title>
 
 <style>
-* {
-    box-sizing: border-box;
+:root {
+    --gold: #d7ad55;
+    --gold-light: #f4d58a;
+    --green: #0b563c;
+    --dark: #080b0a;
+    --white: #f6f2e8;
 }
+
+* { box-sizing: border-box; }
 
 html, body {
     margin: 0;
-    padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -24,25 +29,47 @@ html, body {
 #scoreboard {
     position: absolute;
     left: 50%;
-    bottom: 55px;
+    bottom: 35px;
     transform: translateX(-50%);
-    width: min(1100px, 94vw);
-    color: #fff;
-    background: rgba(5, 12, 10, 0.94);
-    border: 2px solid #d7ad55;
-    border-radius: 12px;
+    width: min(1050px, 96vw);
+    color: var(--white);
+    background: rgba(5, 12, 9, .97);
+    border: 2px solid var(--gold);
+    border-radius: 9px;
     overflow: hidden;
-    box-shadow: 0 5px 25px rgba(0,0,0,.5);
+    box-shadow: 0 8px 30px rgba(0,0,0,.55);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background: linear-gradient(90deg, #073c2b, #0b563c, #073c2b);
+    border-bottom: 1px solid var(--gold);
 }
 
 .brand {
-    background: #0b563c;
-    color: #e4bd68;
-    text-align: center;
-    padding: 8px;
+    color: var(--gold-light);
     font-size: 19px;
     font-weight: 900;
     letter-spacing: 5px;
+}
+
+.live {
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #45e28a;
 }
 
 .players {
@@ -51,59 +78,118 @@ html, body {
 }
 
 .player {
-    padding: 17px 22px;
-    text-align: center;
+    position: relative;
+    padding: 14px 20px 12px;
     min-width: 0;
+    text-align: center;
+    background: rgba(255,255,255,.015);
 }
 
 .player + .player {
-    border-left: 1px solid #80642d;
+    border-left: 1px solid rgba(215,173,85,.5);
 }
 
-.name {
-    color: #f6f2e8;
-    font-size: clamp(16px, 2.2vw, 27px);
-    font-weight: 800;
+.player.active {
+    background: linear-gradient(
+        180deg,
+        rgba(215,173,85,.19),
+        rgba(215,173,85,.025)
+    );
+}
+
+.player.active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 15%;
+    width: 70%;
+    height: 3px;
+    background: var(--gold);
+}
+
+.player-name {
+    color: var(--white);
+    font-size: clamp(17px, 2.3vw, 27px);
+    font-weight: 900;
+    text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
 }
 
-.score {
-    color: #e1b653;
-    font-size: clamp(38px, 5vw, 62px);
-    line-height: 1;
+.active .player-name {
+    color: var(--gold-light);
+}
+
+.at-table {
+    display: none;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 5px;
+}
+
+.active .at-table {
+    display: block;
+}
+
+.player-score {
+    color: #fff;
+    font-size: clamp(45px, 6vw, 68px);
     font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
 }
 
-.details {
-    color: #d6d6d6;
-    font-size: 14px;
-    margin-top: 9px;
+.active .player-score {
+    color: var(--gold-light);
+}
+
+.player-info {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 10px;
+    color: #c9c9c9;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.player-info strong {
+    color: var(--gold-light);
+    margin-left: 4px;
 }
 
 .footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
-    padding: 9px 20px;
-    background: #111c17;
-    border-top: 1px solid #80642d;
-    color: #e7d7ae;
-    font-size: 14px;
-    font-weight: bold;
+    gap: 10px;
+    padding: 11px 15px;
+    background: #101b15;
+    border-top: 1px solid rgba(215,173,85,.5);
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.footer span {
+    text-align: center;
 }
 
 #connection {
     position: absolute;
-    top: 15px;
-    right: 18px;
-    color: #e7d7ae;
-    background: rgba(0,0,0,.7);
-    padding: 7px 12px;
-    border-radius: 6px;
-    font-size: 12px;
+    top: 12px;
+    right: 12px;
+    padding: 6px 10px;
+    background: rgba(0,0,0,.65);
+    border-radius: 4px;
+    color: #45e28a;
+    font-size: 10px;
+    letter-spacing: 1px;
 }
 
 #connection.error {
@@ -111,10 +197,25 @@ html, body {
 }
 
 #waiting {
+    padding: 22px;
     text-align: center;
-    padding: 25px;
-    color: #e1b653;
-    font-size: 20px;
+    color: var(--gold-light);
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 3px;
+}
+
+@media(max-width: 550px) {
+    #scoreboard {
+        bottom: 15px;
+        width: 98vw;
+    }
+
+    .header { padding: 7px 12px; }
+    .brand { font-size: 15px; }
+    .player { padding: 12px 7px; }
+    .player-info { gap: 8px; font-size: 11px; }
+    .footer { font-size: 10px; padding: 9px 5px; }
 }
 </style>
 </head>
@@ -124,29 +225,35 @@ html, body {
 <div id="connection">CONNECTING...</div>
 
 <div id="scoreboard">
-    <div class="brand">Live Scoring</div>
 
-    <div id="waiting">WAITING FOR MATCH...</div>
+    <div class="header">
+        <div class="brand">RRR Cues</div>
+        <div class="live">
+            <span class="live-dot"></span> LIVE SCORE
+        </div>
+    </div>
+
+    <div id="waiting">WAITING FOR MATCH</div>
 
     <div class="players" id="players" style="display:none">
 
-        <div class="player">
-            <div class="name" id="name1">PLAYER 1</div>
-            <div class="score" id="score1">0</div>
-            <div class="details">
-                Frames: <span id="frames1">0</span>
-                &nbsp; | &nbsp;
-                Break: <span id="break1">0</span>
+        <div class="player" id="player1">
+            <div class="at-table">● AT THE TABLE</div>
+            <div class="player-name" id="name1">PLAYER 1</div>
+            <div class="player-score" id="score1">0</div>
+            <div class="player-info">
+                <span>FRAMES<strong id="frames1">0</strong></span>
+                <span>BREAK<strong id="break1">0</strong></span>
             </div>
         </div>
 
-        <div class="player">
-            <div class="name" id="name2">PLAYER 2</div>
-            <div class="score" id="score2">0</div>
-            <div class="details">
-                Frames: <span id="frames2">0</span>
-                &nbsp; | &nbsp;
-                Break: <span id="break2">0</span>
+        <div class="player" id="player2">
+            <div class="at-table">● AT THE TABLE</div>
+            <div class="player-name" id="name2">PLAYER 2</div>
+            <div class="player-score" id="score2">0</div>
+            <div class="player-info">
+                <span>FRAMES<strong id="frames2">0</strong></span>
+                <span>BREAK<strong id="break2">0</strong></span>
             </div>
         </div>
 
@@ -155,8 +262,9 @@ html, body {
     <div class="footer">
         <span id="frame">FRAME 1</span>
         <span id="format">15 REDS | BEST OF 5</span>
-        <span id="matchStatus">LIVE MATCH</span>
+        <span id="status">LIVE MATCH</span>
     </div>
+
 </div>
 
 <script type="module">
@@ -200,40 +308,54 @@ signInAnonymously(auth)
 
         const s = snapshot.val();
 
+        connection.textContent = "● CONNECTED";
+        connection.classList.remove("error");
+
         if (!s) {
             document.getElementById("waiting").style.display = "block";
             document.getElementById("players").style.display = "none";
-            connection.textContent = "CONNECTED";
-            connection.classList.remove("error");
             return;
         }
 
         document.getElementById("waiting").style.display = "none";
         document.getElementById("players").style.display = "grid";
 
+        const names = s.names || [];
+        const scores = s.scores || [];
+        const frames = s.frames || [];
+        const breaks = s.breaks || [];
+
         document.getElementById("name1").textContent =
-            s.names?.[0] || "PLAYER 1";
+            names[0] || "PLAYER 1";
 
         document.getElementById("name2").textContent =
-            s.names?.[1] || "PLAYER 2";
+            names[1] || "PLAYER 2";
 
         document.getElementById("score1").textContent =
-            s.scores?.[0] ?? 0;
+            scores[0] ?? 0;
 
         document.getElementById("score2").textContent =
-            s.scores?.[1] ?? 0;
+            scores[1] ?? 0;
 
         document.getElementById("frames1").textContent =
-            s.frames?.[0] ?? 0;
+            frames[0] ?? 0;
 
         document.getElementById("frames2").textContent =
-            s.frames?.[1] ?? 0;
+            frames[1] ?? 0;
 
         document.getElementById("break1").textContent =
-            s.breaks?.[0] ?? 0;
+            breaks[0] ?? 0;
 
         document.getElementById("break2").textContent =
-            s.breaks?.[1] ?? 0;
+            breaks[1] ?? 0;
+
+        document.getElementById("player1").classList.toggle(
+            "active", s.active === 0
+        );
+
+        document.getElementById("player2").classList.toggle(
+            "active", s.active === 1
+        );
 
         document.getElementById("frame").textContent =
             "FRAME " + (s.frame ?? 1);
@@ -242,11 +364,8 @@ signInAnonymously(auth)
             (s.format || "15 Reds") +
             " | BEST OF " + (s.bestOf || 5);
 
-        document.getElementById("matchStatus").textContent =
+        document.getElementById("status").textContent =
             s.over ? "MATCH OVER" : "LIVE MATCH";
-
-        connection.textContent = "CONNECTED • LIVE";
-        connection.classList.remove("error");
 
     }, showError);
 
