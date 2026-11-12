@@ -203,6 +203,67 @@ html, body {
         font-size: 7px;
         gap: 7px;
     }
+    /* PORTRAIT MODE */
+@media screen and (orientation: portrait) {
+    #scoreboard {
+        width: 100%;
+        bottom: 0;
+    }
+
+    .header {
+        height: 20px;
+        padding: 0 8px;
+        font-size: 9px;
+    }
+
+    .player {
+        padding: 5px 6px;
+        column-gap: 4px;
+    }
+
+    .player-name {
+        font-size: 10px;
+    }
+
+    .player-score {
+        font-size: 21px;
+    }
+
+    .player-score::before {
+        font-size: 6px;
+    }
+
+    .player-info {
+        font-size: 7px;
+        gap: 6px;
+    }
+
+    .footer {
+        height: 19px;
+        padding: 0 7px;
+        font-size: 7px;
+    }
+}
+
+/* VERY NARROW PORTRAIT SCREENS */
+@media screen and (orientation: portrait) and (max-width: 400px) {
+    .player {
+        padding: 4px 4px;
+    }
+
+    .player-name {
+        font-size: 8px;
+    }
+
+    .player-score {
+        font-size: 18px;
+    }
+
+    .player-info {
+        font-size: 6px;
+        gap: 4px;
+    }
+}
 }
 </style>
 </head>
