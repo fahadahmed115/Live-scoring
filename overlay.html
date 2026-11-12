@@ -7,11 +7,12 @@
 <title>RRS CUES - TV Scoreboard</title>
 
 <style>
-
 :root {
     --gold: #d7ad55;
     --gold-light: #f4d58a;
-    --white: #f6f2e8;
+    --dark: #101719;
+    --green: #174c43;
+    --white: #ffffff;
 }
 
 * {
@@ -25,109 +26,89 @@ html, body {
     height: 100%;
     overflow: hidden;
     background: transparent;
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 #scoreboard {
     position: absolute;
-    left: 50%;
-    bottom: 10px;
-    transform: translateX(-50%);
-    width: 58vw;
-    max-width: 720px;
-    background: rgba(5, 12, 9, 0.96);
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(12, 20, 22, .97);
     color: var(--white);
-    border: 1px solid var(--gold);
-    border-radius: 5px;
-    overflow: hidden;
+    border-top: 2px solid #d7ad55;
 }
-
-/* HEADER */
 
 .header {
+    height: 17px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 2px 9px;
-    background: #0b563c;
-    border-bottom: 1px solid var(--gold);
-}
-
-.brand {
-    color: var(--gold-light);
+    justify-content: space-between;
+    padding: 0 12px;
+    background: #174c43;
     font-size: 9px;
-    font-weight: 900;
-    letter-spacing: 3px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
-
-.live {
-    font-size: 7px;
-    font-weight: bold;
-    color: white;
-}
-
-.live-dot {
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    margin-right: 3px;
-    border-radius: 50%;
-    background: #45e28a;
-}
-
-/* PLAYERS */
 
 .players {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    width: 100%;
 }
 
 .player {
     position: relative;
     min-width: 0;
-    padding: 4px 8px;
-    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    padding: 4px 14px;
+    column-gap: 12px;
 }
 
 .player + .player {
-    border-left: 1px solid rgba(215,173,85,.4);
+    border-left: 1px solid rgba(255,255,255,.4);
 }
 
 .player.active {
-    background: rgba(215,173,85,.13);
+    background: rgba(23, 76, 67, .65);
 }
 
 .player.active::before {
     content: "";
     position: absolute;
+    left: 0;
     top: 0;
-    left: 20%;
-    width: 60%;
-    height: 2px;
-    background: var(--gold);
+    bottom: 0;
+    width: 3px;
+    background: #d7ad55;
 }
 
 .at-table {
     display: none;
-    color: var(--gold);
-    font-size: 6px;
-    font-weight: bold;
-    margin-bottom: 2px;
 }
 
 .player.active .at-table {
     display: block;
+    grid-column: 1 / -1;
+    color: var(--gold-light);
+    font-size: 7px;
+    font-weight: bold;
 }
 
 .player-name {
-    color: var(--white);
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    color: white;
     font-size: 12px;
-    font-weight: 900;
+    font-weight: 800;
     text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 2px;
 }
 
 .player.active .player-name {
@@ -135,93 +116,70 @@ html, body {
 }
 
 .player-score {
+    grid-column: 2;
+    grid-row: 1;
     color: white;
     font-size: 25px;
-    font-weight: 900;
     line-height: 1;
+    font-weight: 900;
 }
 
-.player.active .player-score {
-    color: var(--gold-light);
+.player-score::before {
+    content: "SCORE ";
+    font-size: 7px;
+    color: #b9c5c2;
 }
 
 .player-info {
+    grid-column: 1 / -1;
+    grid-row: 2;
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    align-items: center;
+    gap: 13px;
     margin-top: 3px;
-    color: #ccc;
-    font-size: 7px;
-    font-weight: bold;
+    color: #d7ad55;
+    font-size: 8px;
+    font-weight: 800;
+    white-space: nowrap;
 }
 
 .player-info strong {
-    color: var(--gold-light);
+    color: white;
     margin-left: 3px;
 }
 
-/* FOOTER */
-
 .footer {
+    height: 17px;
     display: flex;
-    justify-content: space-around;
     align-items: center;
-    padding: 3px 6px;
-    background: #101b15;
-    border-top: 1px solid rgba(215,173,85,.4);
-    color: var(--gold-light);
-    font-size: 7px;
-    font-weight: bold;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: #174c43;
+    color: white;
+    font-size: 8px;
+    font-weight: 800;
     letter-spacing: .5px;
 }
 
-.footer span {
-    text-align: center;
-}
-
-/* WAITING */
-
-#waiting {
-    padding: 8px;
-    text-align: center;
-    color: var(--gold-light);
-    font-size: 9px;
-    letter-spacing: 1px;
-}
-
-/* CONNECTION */
-
-#connection {
-    position: absolute;
-    top: 6px;
-    right: 7px;
-    padding: 3px 5px;
-    background: rgba(0,0,0,.6);
-    border-radius: 3px;
-    color: #45e28a;
-    font-size: 7px;
-}
-
-#connection.error {
-    color: #ff7777;
-}
-
-/* MOBILE LANDSCAPE */
-
-@media (max-width: 700px) {
-    #scoreboard {
-        width: 75vw;
+@media (max-width: 600px) {
+    .player {
+        padding: 3px 7px;
+        column-gap: 5px;
     }
 
     .player-name {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .player-score {
-        font-size: 22px;
+        font-size: 19px;
+    }
+
+    .player-info {
+        font-size: 7px;
+        gap: 7px;
     }
 }
-
 </style>
 </head>
 
