@@ -7,6 +7,7 @@
 <title>RRS CUES - TV Scoreboard</title>
 
 <style>
+    
 :root {
     --gold: #d7ad55;
     --gold-light: #f4d58a;
@@ -15,10 +16,13 @@
     --white: #f6f2e8;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 html, body {
     margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -26,52 +30,63 @@ html, body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* MAIN SCOREBOARD */
+
 #scoreboard {
-  position: absolute;
+    position: absolute;
     left: 50%;
-    bottom: 30px;
+    bottom: 18px;
     transform: translateX(-50%);
-    width: 85vw;
-    max-width: 1200px;
+    width: 75vw;
+    max-width: 950px;
     color: var(--white);
-    background: rgba(5, 12, 9, .97);
-    border: 2px solid var(--gold);
-    border-radius: 9px;
+    background: rgba(5, 12, 9, 0.96);
+    border: 1.5px solid var(--gold);
+    border-radius: 7px;
     overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0,0,0,.55);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.45);
 }
+
+/* HEADER */
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 20px;
-    background: linear-gradient(90deg, #073c2b, #0b563c, #073c2b);
+    padding: 4px 14px;
+    background: linear-gradient(
+        90deg,
+        #073c2b,
+        #0b563c,
+        #073c2b
+    );
     border-bottom: 1px solid var(--gold);
 }
 
 .brand {
     color: var(--gold-light);
-    font-size: 19px;
+    font-size: 13px;
     font-weight: 900;
-    letter-spacing: 5px;
+    letter-spacing: 4px;
 }
 
 .live {
     color: #fff;
-    font-size: 11px;
+    font-size: 9px;
     font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
 }
 
 .live-dot {
     display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-right: 6px;
+    width: 6px;
+    height: 6px;
+    margin-right: 5px;
     border-radius: 50%;
     background: #45e28a;
 }
+
+/* PLAYERS */
 
 .players {
     display: grid;
@@ -80,22 +95,20 @@ html, body {
 
 .player {
     position: relative;
-    padding: 14px 20px 12px;
     min-width: 0;
+    padding: 7px 12px 6px;
     text-align: center;
-    background: rgba(255,255,255,.015);
+    background: rgba(255,255,255,0.015);
 }
 
 .player + .player {
-    border-left: 1px solid rgba(215,173,85,.5);
+    border-left: 1px solid rgba(215,173,85,0.5);
 }
 
+/* ACTIVE PLAYER */
+
 .player.active {
-    background: linear-gradient(
-        180deg,
-        rgba(215,173,85,.19),
-        rgba(215,173,85,.025)
-    );
+    background: rgba(215,173,85,0.13);
 }
 
 .player.active::before {
@@ -104,57 +117,63 @@ html, body {
     top: 0;
     left: 15%;
     width: 70%;
-    height: 3px;
+    height: 2px;
     background: var(--gold);
 }
 
+.at-table {
+    display: none;
+    color: var(--gold);
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-bottom: 2px;
+}
+
+.player.active .at-table {
+    display: block;
+}
+
+/* PLAYER NAMES */
+
 .player-name {
     color: var(--white);
-    font-size: clamp(17px, 2.3vw, 27px);
+    font-size: 19px;
     font-weight: 900;
     text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 8px;
+    margin-bottom: 3px;
 }
 
-.active .player-name {
+.player.active .player-name {
     color: var(--gold-light);
 }
 
-.at-table {
-    display: none;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: var(--gold);
-    margin-bottom: 5px;
-}
-
-.active .at-table {
-    display: block;
-}
+/* SCORES */
 
 .player-score {
     color: #fff;
-    font-size: clamp(45px, 6vw, 68px);
-    font-weight: 900;
+    font-size: 38px;
     line-height: 1;
+    font-weight: 900;
     font-variant-numeric: tabular-nums;
 }
 
-.active .player-score {
+.player.active .player-score {
     color: var(--gold-light);
 }
+
+/* FRAMES AND BREAK */
 
 .player-info {
     display: flex;
     justify-content: center;
-    gap: 22px;
-    margin-top: 10px;
+    gap: 14px;
+    margin-top: 4px;
     color: #c9c9c9;
-    font-size: 13px;
+    font-size: 10px;
     font-weight: bold;
 }
 
@@ -163,16 +182,18 @@ html, body {
     margin-left: 4px;
 }
 
+/* BOTTOM INFORMATION BAR */
+
 .footer {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    gap: 10px;
-    padding: 11px 15px;
+    gap: 8px;
+    padding: 6px 10px;
     background: #101b15;
-    border-top: 1px solid rgba(215,173,85,.5);
+    border-top: 1px solid rgba(215,173,85,0.5);
     color: var(--gold-light);
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 1px;
 }
@@ -181,15 +202,28 @@ html, body {
     text-align: center;
 }
 
+/* WAITING SCREEN */
+
+#waiting {
+    padding: 12px;
+    text-align: center;
+    color: var(--gold-light);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* CONNECTION STATUS */
+
 #connection {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 6px 10px;
-    background: rgba(0,0,0,.65);
+    top: 8px;
+    right: 10px;
+    padding: 4px 7px;
+    background: rgba(0,0,0,0.65);
     border-radius: 4px;
     color: #45e28a;
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 1px;
 }
 
@@ -197,36 +231,27 @@ html, body {
     color: #ff7777;
 }
 
-#waiting {
-    padding: 22px;
-    text-align: center;
-    color: var(--gold-light);
-    font-size: 17px;
-    font-weight: bold;
-    letter-spacing: 3px;
-}
+/* LANDSCAPE RESPONSIVENESS */
 
-@media(max-width: 900px) {
+@media (max-width: 700px) {
     #scoreboard {
-        width: 92vw;
-        bottom: 20px;
+        width: 90vw;
+        bottom: 12px;
+    }
+
+    .player-name {
+        font-size: 15px;
     }
 
     .player-score {
-        font-size: 48px;
-    }
-}
-    #scoreboard {
-        bottom: 15px;
-        width: 98vw;
+        font-size: 32px;
     }
 
-    .header { padding: 7px 12px; }
-    .brand { font-size: 15px; }
-    .player { padding: 12px 7px; }
-    .player-info { gap: 8px; font-size: 11px; }
-    .footer { font-size: 10px; padding: 9px 5px; }
+    .footer {
+        font-size: 9px;
+    }
 }
+
 </style>
 </head>
 
