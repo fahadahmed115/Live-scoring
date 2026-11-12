@@ -1,224 +1,312 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Live Scoring</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Snooker Scoring</title>
 <style>
+:root{--gold:#d7ad55;--dark:#080b0a;--white:#f6f2e8}
 *{box-sizing:border-box}
-body{margin:0;padding:18px;background:#07110e;color:#fff;font-family:Arial}
-main{max-width:700px;margin:auto}
-h1{text-align:center;color:#d6b15e;letter-spacing:3px}
-.card{background:#14251e;border:1px solid #b18b42;border-radius:14px;padding:16px;margin:15px 0}
-label{display:block;color:#d6b15e;margin:10px 0 5px}
-input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #806b3c;background:#09150f;color:white;font-size:15px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.scoreboard{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:10px}
-.name{color:#e3c276;font-size:18px}
-.score{font-size:55px;font-weight:bold}
+body{margin:0;background:var(--dark);color:var(--white);font-family:Arial,sans-serif}
+header{text-align:center;padding:22px;border-bottom:1px solid #39443c}
+header h1{color:var(--gold);letter-spacing:5px;margin:0}
+header p{color:#aaa;font-size:12px;letter-spacing:2px}
+main{max-width:950px;margin:25px auto;padding:15px}
+.panel{background:#131b17;border:1px solid #344238;border-radius:12px;padding:20px;margin-bottom:18px}
+input,select{width:100%;padding:12px;margin:7px 0 14px;background:#080d0b;color:white;border:1px solid #455348;border-radius:7px}
+label{color:var(--gold);font-size:12px}
+button{padding:12px 16px;margin:4px;border:none;border-radius:7px;background:var(--gold);color:#111;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.secondary{background:#29382e;color:white}
+.danger{background:#792f29;color:white}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center}
+.player{padding:20px 8px;background:#17251d;border-radius:10px;border:1px solid #344238}
+.player.active{border:2px solid var(--gold)}
+.player h2{font-size:20px;overflow-wrap:anywhere}
+.score{font-size:65px;font-weight:bold;color:var(--gold)}
 .frames{color:#aaa}
-button{margin-top:8px;background:#263c30;cursor:pointer}
-.gold{background:#d6b15e;color:#111;font-weight:bold}
-.danger{background:#602c27}
-.ballgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-#status{text-align:center;color:#d6b15e;font-size:13px}
+.ball-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ball-grid button{min-height:65px}
+.red{background:#a52d2d;color:white}
+.yellow{background:#b99a27}
+.green{background:#176b43;color:white}
+.brown{background:#754b2d;color:white}
+.blue{background:#245c9b;color:white}
+.pink{background:#b65d83;color:white}
+.black{background:#050505;color:white;border:1px solid #777}
+.status{color:#aaa;margin-top:15px;font-size:13px}
+@media(max-width:500px){.score{font-size:48px}.player h2{font-size:16px}.ball-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
-<main>
+
+<header>
 <h1></h1>
-<p style="text-align:center">LIVE MATCH SCORING</p>
+<p>SNOOKER CLUB • LIVE SCORING</p>
+</header>
 
-<div class="card">
+<main>
+<section class="panel">
+<h3>Match Setup</h3>
 <label>Player 1</label>
-<input id="p1" placeholder="Player 1">
+<input id="player1" value="Player 1">
 <label>Player 2</label>
-<input id="p2" placeholder="Player 2">
-
-<div class="row">
-<div>
-<label>Reds</label>
-<select id="reds">
-<option>15</option><option>6</option>
+<input id="player2" value="Player 2">
+<label>Match Format</label>
+<select id="format">
+<option>15 Reds</option>
+<option>6 Reds</option>
 </select>
-</div>
-<div>
-<label>Best of</label>
-<select id="best">
-<option>1</option><option>3</option>
-<option>5</option><option>7</option>
-<option>9</option>
+<label>Match Type</label>
+<select id="bestOf">
+<option value="3">Best of 3</option>
+<option value="5" selected>Best of 5</option>
+<option value="7">Best of 7</option>
+<option value="9">Best of 9</option>
 </select>
-</div>
-</div>
-<button class="gold" id="start">START MATCH</button>
-</div>
+<button id="start">START MATCH</button>
+</section>
 
-<div class="card">
-<div class="scoreboard">
-<div>
-<div class="name" id="name1">PLAYER 1</div>
+<section class="panel">
+<div class="players">
+<div class="player active" id="box0">
+<h2 id="name0">Player 1</h2>
+<div class="score" id="score0">0</div>
+<div class="frames">Frames: <span id="frames0">0</span></div>
+<p id="break0">Break: 0</p>
+<small id="turn0">AT THE TABLE</small>
+</div>
+<div class="player" id="box1">
+<h2 id="name1">Player 2</h2>
 <div class="score" id="score1">0</div>
 <div class="frames">Frames: <span id="frames1">0</span></div>
-</div>
-<div>
-<div class="name" id="name2">PLAYER 2</div>
-<div class="score" id="score2">0</div>
-<div class="frames">Frames: <span id="frames2">0</span></div>
+<p id="break1">Break: 0</p>
+<small id="turn1">WAITING</small>
 </div>
 </div>
-<p id="frame" style="text-align:center;color:#d6b15e">FRAME 1</p>
-<p id="status">Connecting...</p>
-</div>
+<p id="matchInfo" style="text-align:center;color:#d7ad55">15 REDS • BEST OF 5 • FRAME 1</p>
+</section>
 
-<div class="card">
-<label>Choose player to score</label>
-<div class="row">
-<button id="player1">PLAYER 1</button>
-<button id="player2">PLAYER 2</button>
+<section class="panel">
+<h3>Ball Scoring</h3>
+<div class="ball-grid">
+<button class="red" data-points="1" data-ball="Red">RED +1</button>
+<button class="yellow" data-points="2" data-ball="Yellow">YELLOW +2</button>
+<button class="green" data-points="3" data-ball="Green">GREEN +3</button>
+<button class="brown" data-points="4" data-ball="Brown">BROWN +4</button>
+<button class="blue" data-points="5" data-ball="Blue">BLUE +5</button>
+<button class="pink" data-points="6" data-ball="Pink">PINK +6</button>
+<button class="black" data-points="7" data-ball="Black">BLACK +7</button>
 </div>
-
-<label>Pot a ball</label>
-<div class="ballgrid" id="balls"></div>
-
-<label>Foul</label>
-<div class="row">
-<button id="foul1">FOUL TO PLAYER 1</button>
-<button id="foul2">FOUL TO PLAYER 2</button>
-</div>
-
-<div class="row">
-<button id="undo">UNDO</button>
-<button id="endframe" class="gold">END FRAME</button>
-</div>
-<button id="reset" class="danger">RESET MATCH</button>
-</div>
+<h3>Fouls</h3>
+<button class="secondary" data-foul="4">FOUL 4</button>
+<button class="secondary" data-foul="5">FOUL 5</button>
+<button class="secondary" data-foul="6">FOUL 6</button>
+<button class="secondary" data-foul="7">FOUL 7</button>
+<hr style="border-color:#344238;margin:20px 0">
+<button id="changeTurn">CHANGE TURN</button>
+<button class="secondary" id="undo">UNDO</button>
+<button class="secondary" id="endFrame">END FRAME</button>
+<button class="danger" id="reset">RESET MATCH</button>
+<p class="status" id="status">Connecting to Firebase...</p>
+</section>
 </main>
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {getDatabase,ref,onValue,runTransaction} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,signInAnonymously}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {getDatabase,ref,onValue,runTransaction}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
-const firebaseConfig = {
+const firebaseConfig={
 apiKey:"AIzaSyBMcKNgIMqHCWishymhmhQ12LOrXGONzvM",
 authDomain:"live-scoring-51bdc.firebaseapp.com",
 databaseURL:"https://live-scoring-51bdc-default-rtdb.asia-southeast1.firebasedatabase.app",
 projectId:"live-scoring-51bdc",
 storageBucket:"live-scoring-51bdc.firebasestorage.app",
 messagingSenderId:"814952232826",
-appId:"1:814952232826:web:99ba2bb19d8a7b9481c8c3"
+appId:"1:99ba2bb19d8a7b9481c8c3"
 };
+
+// Correct Firebase app ID
+firebaseConfig.appId="1:814952232826:web:99ba2bb19d8a7b9481c8c3";
 
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getDatabase(app);
 const matchRef=ref(db,"matches/current");
 
-let activePlayer=1;
-let history=[];
-let state=null;
+let game=null;
+let ready=false;
 
 const $=id=>document.getElementById(id);
 
 function blank(){
 return {
-p1:"PLAYER 1",p2:"PLAYER 2",
-s1:0,s2:0,f1:0,f2:0,
-frame:1,reds:15,best:3,over:false
+names:["Player 1","Player 2"],
+scores:[0,0],
+frames:[0,0],
+breaks:[0,0],
+active:0,
+frame:1,
+bestOf:5,
+format:"15 Reds",
+over:false,
+history:[]
 };
 }
 
-function render(s){
-state=s;
-$("name1").textContent=s.p1;
-$("name2").textContent=s.p2;
-$("score1").textContent=s.s1;
-$("score2").textContent=s.s2;
-$("frames1").textContent=s.f1;
-$("frames2").textContent=s.f2;
-$("frame").textContent="FRAME "+s.frame;
-$("player1").textContent=s.p1;
-$("player2").textContent=s.p2;
-$("status").textContent=s.over?"MATCH COMPLETE":"LIVE";
-$("foul1").textContent="FOUL TO "+s.p1;
-$("foul2").textContent="FOUL TO "+s.p2;
+function render(g){
+game=g;
+
+for(let i=0;i<2;i++){
+$("name"+i).textContent=g.names[i];
+$("score"+i).textContent=g.scores[i];
+$("frames"+i).textContent=g.frames[i];
+$("break"+i).textContent="Break: "+g.breaks[i];
+$("box"+i).classList.toggle("active",g.active===i);
+$("turn"+i).textContent=g.active===i?"AT THE TABLE":"WAITING";
 }
 
-async function change(fn){
-if(!state || state.over)return;
-history.push({...state});
-await runTransaction(matchRef,current=>{
-return fn(current || blank());
+$("matchInfo").textContent=
+g.format.toUpperCase()+" • BEST OF "+g.bestOf+" • FRAME "+g.frame+
+(g.over?" • MATCH COMPLETE":"");
+
+$("status").textContent=g.over
+?"MATCH COMPLETE"
+:"CONNECTED • LIVE SCORE SYNC";
+
+document.querySelectorAll("button").forEach(b=>{
+if(b.id!=="reset" && b.id!=="start")b.disabled=!ready||!g||g.over;
 });
+$("start").disabled=!ready;
+}
+
+function snapshot(g){
+return {
+names:[...g.names],
+scores:[...g.scores],
+frames:[...g.frames],
+breaks:[...g.breaks],
+active:g.active,
+frame:g.frame,
+bestOf:g.bestOf,
+format:g.format,
+over:g.over,
+history:[]
+};
+}
+
+async function update(action){
+if(!ready||!game||game.over)return;
+
+try{
+const result=await runTransaction(matchRef,current=>{
+if(!current||current.over)return;
+const g={...current};
+g.names=[...current.names];
+g.scores=[...current.scores];
+g.frames=[...current.frames];
+g.breaks=[...current.breaks];
+g.history=[...(current.history||[])];
+
+g.history.push(snapshot(current));
+if(g.history.length>30)g.history.shift();
+
+action(g);
+return g;
+});
+if(!result.committed)$("status").textContent="No change made.";
+}catch(e){
+$("status").textContent="UPDATE ERROR: "+e.message;
+}
 }
 
 $("start").onclick=async()=>{
-const s=blank();
-s.p1=$("p1").value.trim()||"PLAYER 1";
-s.p2=$("p2").value.trim()||"PLAYER 2";
-s.reds=Number($("reds").value);
-s.best=Number($("best").value);
-history=[];
-await runTransaction(matchRef,()=>s);
+if(!ready)return;
+const g=blank();
+g.names=[
+$("player1").value.trim()||"Player 1",
+$("player2").value.trim()||"Player 2"
+];
+g.format=$("format").value;
+g.bestOf=Number($("bestOf").value);
+
+try{
+await runTransaction(matchRef,()=>g);
+}catch(e){$("status").textContent="ERROR: "+e.message;}
 };
 
-$("player1").onclick=()=>activePlayer=1;
-$("player2").onclick=()=>activePlayer=2;
-
-const balls=[
-["RED",1],["YELLOW",2],["GREEN",3],
-["BROWN",4],["BLUE",5],["PINK",6],["BLACK",7]
-];
-
-balls.forEach(([name,points])=>{
-const b=document.createElement("button");
-b.textContent=name+" +"+points;
-b.onclick=()=>change(s=>({
-...s,
-[activePlayer===1?"s1":"s2"]:
-s[activePlayer===1?"s1":"s2"]+points
-}));
-$("balls").appendChild(b);
+document.querySelectorAll("[data-points]").forEach(button=>{
+button.onclick=()=>update(g=>{
+const p=g.active;
+const points=Number(button.dataset.points);
+g.scores[p]+=points;
+g.breaks[p]+=points;
+});
 });
 
-$("foul1").onclick=()=>change(s=>({...s,s1:s.s1+4}));
-$("foul2").onclick=()=>change(s=>({...s,s2:s.s2+4}));
+document.querySelectorAll("[data-foul]").forEach(button=>{
+button.onclick=()=>update(g=>{
+const points=Number(button.dataset.foul);
+const opponent=1-g.active;
+g.scores[opponent]+=points;
+g.breaks[g.active]=0;
+g.active=opponent;
+});
+});
+
+$("changeTurn").onclick=()=>update(g=>{
+g.breaks[g.active]=0;
+g.active=1-g.active;
+});
 
 $("undo").onclick=async()=>{
+if(!ready)return;
+const result=await runTransaction(matchRef,current=>{
+if(!current||!current.history||!current.history.length)return;
+const history=[...current.history];
 const previous=history.pop();
-if(previous)await runTransaction(matchRef,()=>previous);
+return {...previous,history};
+});
+if(!result.committed)$("status").textContent="Nothing to undo.";
 };
 
-$("endframe").onclick=()=>change(s=>{
-if(s.s1>s.s2)s.f1++;
-else if(s.s2>s.s1)s.f2++;
-const target=Math.floor(s.best/2)+1;
-return {
-...s,
-s1:0,s2:0,
-frame:s.frame+1,
-over:s.f1>=target||s.f2>=target
-};
+$("endFrame").onclick=()=>update(g=>{
+if(g.scores[0]===g.scores[1]){
+g.history.pop();
+return;
+}
+const winner=g.scores[0]>g.scores[1]?0:1;
+g.frames[winner]++;
+const target=Math.floor(g.bestOf/2)+1;
+g.over=g.frames[winner]>=target;
+g.scores=[0,0];
+g.breaks=[0,0];
+g.active=0;
+if(!g.over)g.frame++;
 });
 
 $("reset").onclick=async()=>{
-if(confirm("Reset entire match?")){
-history=[];
+if(!ready)return;
+if(confirm("Reset the entire match?")){
 await runTransaction(matchRef,()=>blank());
 }
 };
 
-signInAnonymously(auth).then(()=>{
-onValue(matchRef,snapshot=>{
-if(snapshot.exists())render(snapshot.val());
-else runTransaction(matchRef,()=>blank());
+signInAnonymously(auth).then(async()=>{
+onValue(matchRef,snap=>{
+if(snap.exists())render(snap.val());
+else render(blank());
 });
-$("status").textContent="CONNECTED";
+ready=true;
+$("status").textContent="CONNECTED TO FIREBASE";
+$("start").disabled=false;
 }).catch(error=>{
-$("status").textContent="CONNECTION ERROR: "+error.message;
+$("status").textContent="FIREBASE ERROR: "+error.message;
 });
 </script>
 </body>
