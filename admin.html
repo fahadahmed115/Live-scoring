@@ -1,1 +1,225 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Scoring</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:18px;background:#07110e;color:#fff;font-family:Arial}
+main{max-width:700px;margin:auto}
+h1{text-align:center;color:#d6b15e;letter-spacing:3px}
+.card{background:#14251e;border:1px solid #b18b42;border-radius:14px;padding:16px;margin:15px 0}
+label{display:block;color:#d6b15e;margin:10px 0 5px}
+input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #806b3c;background:#09150f;color:white;font-size:15px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:10px}
+.name{color:#e3c276;font-size:18px}
+.score{font-size:55px;font-weight:bold}
+.frames{color:#aaa}
+button{margin-top:8px;background:#263c30;cursor:pointer}
+.gold{background:#d6b15e;color:#111;font-weight:bold}
+.danger{background:#602c27}
+.ballgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+#status{text-align:center;color:#d6b15e;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<h1></h1>
+<p style="text-align:center">LIVE MATCH SCORING</p>
+
+<div class="card">
+<label>Player 1</label>
+<input id="p1" placeholder="Player 1">
+<label>Player 2</label>
+<input id="p2" placeholder="Player 2">
+
+<div class="row">
+<div>
+<label>Reds</label>
+<select id="reds">
+<option>15</option><option>6</option>
+</select>
+</div>
+<div>
+<label>Best of</label>
+<select id="best">
+<option>1</option><option>3</option>
+<option>5</option><option>7</option>
+<option>9</option>
+</select>
+</div>
+</div>
+<button class="gold" id="start">START MATCH</button>
+</div>
+
+<div class="card">
+<div class="scoreboard">
+<div>
+<div class="name" id="name1">PLAYER 1</div>
+<div class="score" id="score1">0</div>
+<div class="frames">Frames: <span id="frames1">0</span></div>
+</div>
+<div>
+<div class="name" id="name2">PLAYER 2</div>
+<div class="score" id="score2">0</div>
+<div class="frames">Frames: <span id="frames2">0</span></div>
+</div>
+</div>
+<p id="frame" style="text-align:center;color:#d6b15e">FRAME 1</p>
+<p id="status">Connecting...</p>
+</div>
+
+<div class="card">
+<label>Choose player to score</label>
+<div class="row">
+<button id="player1">PLAYER 1</button>
+<button id="player2">PLAYER 2</button>
+</div>
+
+<label>Pot a ball</label>
+<div class="ballgrid" id="balls"></div>
+
+<label>Foul</label>
+<div class="row">
+<button id="foul1">FOUL TO PLAYER 1</button>
+<button id="foul2">FOUL TO PLAYER 2</button>
+</div>
+
+<div class="row">
+<button id="undo">UNDO</button>
+<button id="endframe" class="gold">END FRAME</button>
+</div>
+<button id="reset" class="danger">RESET MATCH</button>
+</div>
+</main>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {getDatabase,ref,onValue,runTransaction} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyBMcKNgIMqHCWishymhmhQ12LOrXGONzvM",
+authDomain:"live-scoring-51bdc.firebaseapp.com",
+databaseURL:"https://live-scoring-51bdc-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"live-scoring-51bdc",
+storageBucket:"live-scoring-51bdc.firebasestorage.app",
+messagingSenderId:"814952232826",
+appId:"1:814952232826:web:99ba2bb19d8a7b9481c8c3"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
+const matchRef=ref(db,"matches/current");
+
+let activePlayer=1;
+let history=[];
+let state=null;
+
+const $=id=>document.getElementById(id);
+
+function blank(){
+return {
+p1:"PLAYER 1",p2:"PLAYER 2",
+s1:0,s2:0,f1:0,f2:0,
+frame:1,reds:15,best:3,over:false
+};
+}
+
+function render(s){
+state=s;
+$("name1").textContent=s.p1;
+$("name2").textContent=s.p2;
+$("score1").textContent=s.s1;
+$("score2").textContent=s.s2;
+$("frames1").textContent=s.f1;
+$("frames2").textContent=s.f2;
+$("frame").textContent="FRAME "+s.frame;
+$("player1").textContent=s.p1;
+$("player2").textContent=s.p2;
+$("status").textContent=s.over?"MATCH COMPLETE":"LIVE";
+$("foul1").textContent="FOUL TO "+s.p1;
+$("foul2").textContent="FOUL TO "+s.p2;
+}
+
+async function change(fn){
+if(!state || state.over)return;
+history.push({...state});
+await runTransaction(matchRef,current=>{
+return fn(current || blank());
+});
+}
+
+$("start").onclick=async()=>{
+const s=blank();
+s.p1=$("p1").value.trim()||"PLAYER 1";
+s.p2=$("p2").value.trim()||"PLAYER 2";
+s.reds=Number($("reds").value);
+s.best=Number($("best").value);
+history=[];
+await runTransaction(matchRef,()=>s);
+};
+
+$("player1").onclick=()=>activePlayer=1;
+$("player2").onclick=()=>activePlayer=2;
+
+const balls=[
+["RED",1],["YELLOW",2],["GREEN",3],
+["BROWN",4],["BLUE",5],["PINK",6],["BLACK",7]
+];
+
+balls.forEach(([name,points])=>{
+const b=document.createElement("button");
+b.textContent=name+" +"+points;
+b.onclick=()=>change(s=>({
+...s,
+[activePlayer===1?"s1":"s2"]:
+s[activePlayer===1?"s1":"s2"]+points
+}));
+$("balls").appendChild(b);
+});
+
+$("foul1").onclick=()=>change(s=>({...s,s1:s.s1+4}));
+$("foul2").onclick=()=>change(s=>({...s,s2:s.s2+4}));
+
+$("undo").onclick=async()=>{
+const previous=history.pop();
+if(previous)await runTransaction(matchRef,()=>previous);
+};
+
+$("endframe").onclick=()=>change(s=>{
+if(s.s1>s.s2)s.f1++;
+else if(s.s2>s.s1)s.f2++;
+const target=Math.floor(s.best/2)+1;
+return {
+...s,
+s1:0,s2:0,
+frame:s.frame+1,
+over:s.f1>=target||s.f2>=target
+};
+});
+
+$("reset").onclick=async()=>{
+if(confirm("Reset entire match?")){
+history=[];
+await runTransaction(matchRef,()=>blank());
+}
+};
+
+signInAnonymously(auth).then(()=>{
+onValue(matchRef,snapshot=>{
+if(snapshot.exists())render(snapshot.val());
+else runTransaction(matchRef,()=>blank());
+});
+$("status").textContent="CONNECTED";
+}).catch(error=>{
+$("status").textContent="CONNECTION ERROR: "+error.message;
+});
+</script>
+</body>
+</html>
