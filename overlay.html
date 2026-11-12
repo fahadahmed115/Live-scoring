@@ -3,142 +3,256 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RRS CUES Live Scoreboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RRS CUES - Live Score Overlay</title>
+
 <style>
-*{box-sizing:border-box}
-body{
-margin:0;
-background:transparent;
-color:white;
-font-family:Arial,sans-serif;
+* {
+    box-sizing: border-box;
 }
-.board{
-width:100%;
-max-width:1000px;
-margin:15px auto;
-background:linear-gradient(110deg,#07130f,#173628);
-border:2px solid #d6b15e;
-border-radius:12px;
-overflow:hidden;
-box-shadow:0 5px 25px #0008;
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: Arial, Helvetica, sans-serif;
 }
-.top{
-background:#d6b15e;
-color:#15120a;
-text-align:center;
-font-weight:bold;
-letter-spacing:5px;
-padding:10px;
+
+#scoreboard {
+    position: absolute;
+    left: 50%;
+    bottom: 55px;
+    transform: translateX(-50%);
+    width: min(1100px, 94vw);
+    color: #fff;
+    background: rgba(5, 12, 10, 0.94);
+    border: 2px solid #d7ad55;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,.5);
 }
-.content{
-display:grid;
-grid-template-columns:1fr auto 1fr;
-align-items:center;
-gap:10px;
-padding:18px 12px;
+
+.brand {
+    background: #0b563c;
+    color: #e4bd68;
+    text-align: center;
+    padding: 8px;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 5px;
 }
-.player{text-align:center}
-.name{
-font-size:clamp(16px,3vw,28px);
-font-weight:bold;
-color:#f3d78f;
+
+.players {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
-.score{
-font-size:clamp(38px,7vw,70px);
-font-weight:bold;
+
+.player {
+    padding: 17px 22px;
+    text-align: center;
+    min-width: 0;
 }
-.frames{color:#c9d5cc;font-size:14px}
-.mid{
-text-align:center;
-color:#e0bd6b;
-font-size:14px;
-white-space:nowrap;
+
+.player + .player {
+    border-left: 1px solid #80642d;
 }
-.foot{
-text-align:center;
-background:#07110e;
-padding:8px;
-color:#c9ad69;
-font-size:12px;
-letter-spacing:2px;
+
+.name {
+    color: #f6f2e8;
+    font-size: clamp(16px, 2.2vw, 27px);
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 7px;
+}
+
+.score {
+    color: #e1b653;
+    font-size: clamp(38px, 5vw, 62px);
+    line-height: 1;
+    font-weight: 900;
+}
+
+.details {
+    color: #d6d6d6;
+    font-size: 14px;
+    margin-top: 9px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 20px;
+    background: #111c17;
+    border-top: 1px solid #80642d;
+    color: #e7d7ae;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#connection {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    color: #e7d7ae;
+    background: rgba(0,0,0,.7);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+#connection.error {
+    color: #ff7777;
+}
+
+#waiting {
+    text-align: center;
+    padding: 25px;
+    color: #e1b653;
+    font-size: 20px;
 }
 </style>
 </head>
+
 <body>
 
-<div class="board">
-<div class="top">RRS CUES</div>
+<div id="connection">CONNECTING...</div>
 
-<div class="content">
-<div class="player">
-<div class="name" id="p1">PLAYER 1</div>
-<div class="score" id="s1">0</div>
-<div class="frames">FRAMES <span id="f1">0</span></div>
-</div>
+<div id="scoreboard">
+    <div class="brand">RRS CUES</div>
 
-<div class="mid">
-FRAME <b id="frame">1</b>
-<br>LIVE
-</div>
+    <div id="waiting">WAITING FOR MATCH...</div>
 
-<div class="player">
-<div class="name" id="p2">PLAYER 2</div>
-<div class="score" id="s2">0</div>
-<div class="frames">FRAMES <span id="f2">0</span></div>
-</div>
-</div>
+    <div class="players" id="players" style="display:none">
 
-<div class="foot" id="status">
-LIVE MATCH SCOREBOARD
-</div>
+        <div class="player">
+            <div class="name" id="name1">PLAYER 1</div>
+            <div class="score" id="score1">0</div>
+            <div class="details">
+                Frames: <span id="frames1">0</span>
+                &nbsp; | &nbsp;
+                Break: <span id="break1">0</span>
+            </div>
+        </div>
+
+        <div class="player">
+            <div class="name" id="name2">PLAYER 2</div>
+            <div class="score" id="score2">0</div>
+            <div class="details">
+                Frames: <span id="frames2">0</span>
+                &nbsp; | &nbsp;
+                Break: <span id="break2">0</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <span id="frame">FRAME 1</span>
+        <span id="format">15 REDS | BEST OF 5</span>
+        <span id="matchStatus">LIVE MATCH</span>
+    </div>
 </div>
 
 <script type="module">
-import {initializeApp}
+import { initializeApp }
 from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 
-import {getAuth,signInAnonymously}
+import { getAuth, signInAnonymously }
 from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
-import {getDatabase,ref,onValue}
+import { getDatabase, ref, onValue }
 from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
-const firebaseConfig={
-apiKey:"AIzaSyBMcKNgIMqHCWishymhmhQ12LOrXGONzvM",
-authDomain:"live-scoring-51bdc.firebaseapp.com",
-databaseURL:"https://live-scoring-51bdc-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"live-scoring-51bdc",
-storageBucket:"live-scoring-51bdc.firebasestorage.app",
-messagingSenderId:"814952232826",
-appId:"1:814952232826:web:99ba2bb19d8a7b9481c8c3"
+const firebaseConfig = {
+    apiKey: "AIzaSyBMcKNgIMqHCWishymhmhQ12LOrXGONzvM",
+    authDomain: "live-scoring-51bdc.firebaseapp.com",
+    databaseURL: "https://live-scoring-51bdc-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "live-scoring-51bdc",
+    storageBucket: "live-scoring-51bdc.firebasestorage.app",
+    messagingSenderId: "814952232826",
+    appId: "1:814952232826:web:99ba2bb19d8a7b9481c8c3"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-signInAnonymously(auth).then(()=>{
-onValue(ref(db,"matches/current"),snapshot=>{
-if(!snapshot.exists())return;
+const connection = document.getElementById("connection");
 
-const s=snapshot.val();
+function showError(error) {
+    connection.textContent = "CONNECTION ERROR";
+    connection.classList.add("error");
+    console.error(error);
+}
 
-document.getElementById("p1").textContent=s.p1||"PLAYER 1";
-document.getElementById("p2").textContent=s.p2||"PLAYER 2";
-document.getElementById("s1").textContent=s.s1??0;
-document.getElementById("s2").textContent=s.s2??0;
-document.getElementById("f1").textContent=s.f1??0;
-document.getElementById("f2").textContent=s.f2??0;
-document.getElementById("frame").textContent=s.frame??1;
+signInAnonymously(auth)
+.then(() => {
 
-document.getElementById("status").textContent=
-s.over?"MATCH COMPLETE":"LIVE MATCH SCOREBOARD";
-});
-}).catch(error=>{
-document.getElementById("status").textContent=
-"CONNECTION ERROR: "+error.message;
-});
+    const matchRef = ref(db, "matches/current");
+
+    onValue(matchRef, (snapshot) => {
+
+        const s = snapshot.val();
+
+        if (!s) {
+            document.getElementById("waiting").style.display = "block";
+            document.getElementById("players").style.display = "none";
+            connection.textContent = "CONNECTED";
+            connection.classList.remove("error");
+            return;
+        }
+
+        document.getElementById("waiting").style.display = "none";
+        document.getElementById("players").style.display = "grid";
+
+        document.getElementById("name1").textContent =
+            s.names?.[0] || "PLAYER 1";
+
+        document.getElementById("name2").textContent =
+            s.names?.[1] || "PLAYER 2";
+
+        document.getElementById("score1").textContent =
+            s.scores?.[0] ?? 0;
+
+        document.getElementById("score2").textContent =
+            s.scores?.[1] ?? 0;
+
+        document.getElementById("frames1").textContent =
+            s.frames?.[0] ?? 0;
+
+        document.getElementById("frames2").textContent =
+            s.frames?.[1] ?? 0;
+
+        document.getElementById("break1").textContent =
+            s.breaks?.[0] ?? 0;
+
+        document.getElementById("break2").textContent =
+            s.breaks?.[1] ?? 0;
+
+        document.getElementById("frame").textContent =
+            "FRAME " + (s.frame ?? 1);
+
+        document.getElementById("format").textContent =
+            (s.format || "15 Reds") +
+            " | BEST OF " + (s.bestOf || 5);
+
+        document.getElementById("matchStatus").textContent =
+            s.over ? "MATCH OVER" : "LIVE MATCH";
+
+        connection.textContent = "CONNECTED • LIVE";
+        connection.classList.remove("error");
+
+    }, showError);
+
+})
+.catch(showError);
 </script>
+
 </body>
 </html>
