@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RRS CUES Live Scoreboard</title>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+background:transparent;
+color:white;
+font-family:Arial,sans-serif;
+}
+.board{
+width:100%;
+max-width:1000px;
+margin:15px auto;
+background:linear-gradient(110deg,#07130f,#173628);
+border:2px solid #d6b15e;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 5px 25px #0008;
+}
+.top{
+background:#d6b15e;
+color:#15120a;
+text-align:center;
+font-weight:bold;
+letter-spacing:5px;
+padding:10px;
+}
+.content{
+display:grid;
+grid-template-columns:1fr auto 1fr;
+align-items:center;
+gap:10px;
+padding:18px 12px;
+}
+.player{text-align:center}
+.name{
+font-size:clamp(16px,3vw,28px);
+font-weight:bold;
+color:#f3d78f;
+}
+.score{
+font-size:clamp(38px,7vw,70px);
+font-weight:bold;
+}
+.frames{color:#c9d5cc;font-size:14px}
+.mid{
+text-align:center;
+color:#e0bd6b;
+font-size:14px;
+white-space:nowrap;
+}
+.foot{
+text-align:center;
+background:#07110e;
+padding:8px;
+color:#c9ad69;
+font-size:12px;
+letter-spacing:2px;
+}
+</style>
+</head>
+<body>
+
+<div class="board">
+<div class="top">RRS CUES</div>
+
+<div class="content">
+<div class="player">
+<div class="name" id="p1">PLAYER 1</div>
+<div class="score" id="s1">0</div>
+<div class="frames">FRAMES <span id="f1">0</span></div>
+</div>
+
+<div class="mid">
+FRAME <b id="frame">1</b>
+<br>LIVE
+</div>
+
+<div class="player">
+<div class="name" id="p2">PLAYER 2</div>
+<div class="score" id="s2">0</div>
+<div class="frames">FRAMES <span id="f2">0</span></div>
+</div>
+</div>
+
+<div class="foot" id="status">
+LIVE MATCH SCOREBOARD
+</div>
+</div>
+
+<script type="module">
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {getAuth,signInAnonymously}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {getDatabase,ref,onValue}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBMcKNgIMqHCWishymhmhQ12LOrXGONzvM",
+authDomain:"live-scoring-51bdc.firebaseapp.com",
+databaseURL:"https://live-scoring-51bdc-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"live-scoring-51bdc",
+storageBucket:"live-scoring-51bdc.firebasestorage.app",
+messagingSenderId:"814952232826",
+appId:"1:814952232826:web:99ba2bb19d8a7b9481c8c3"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
+
+signInAnonymously(auth).then(()=>{
+onValue(ref(db,"matches/current"),snapshot=>{
+if(!snapshot.exists())return;
+
+const s=snapshot.val();
+
+document.getElementById("p1").textContent=s.p1||"PLAYER 1";
+document.getElementById("p2").textContent=s.p2||"PLAYER 2";
+document.getElementById("s1").textContent=s.s1??0;
+document.getElementById("s2").textContent=s.s2??0;
+document.getElementById("f1").textContent=s.f1??0;
+document.getElementById("f2").textContent=s.f2??0;
+document.getElementById("frame").textContent=s.frame??1;
+
+document.getElementById("status").textContent=
+s.over?"MATCH COMPLETE":"LIVE MATCH SCOREBOARD";
+});
+}).catch(error=>{
+document.getElementById("status").textContent=
+"CONNECTION ERROR: "+error.message;
+});
+</script>
+</body>
+</html>
