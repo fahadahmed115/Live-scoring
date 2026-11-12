@@ -50,6 +50,30 @@ html, body {
     font-weight: 800;
     letter-spacing: 1px;
 }
+    .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff3030;
+    box-shadow: 0 0 6px #ff3030;
+    animation: livePulse 1.2s infinite;
+}
+
+@keyframes livePulse {
+    50% {
+        opacity: .35;
+    }
+}
 
 .players {
     display: grid;
